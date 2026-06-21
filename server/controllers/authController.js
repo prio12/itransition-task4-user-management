@@ -107,6 +107,7 @@ export const loginUser = async (req, res) => {
 
 //get all users based on last login
 export const getAllUsers = async (req, res) => {
+  console.log("enterin in get all users");
   try {
     const query = `
       SELECT id, name, email, status, last_login_at, created_at 

@@ -18,13 +18,14 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/verify-email", verifyEmail);
 
-//Global guard for all protected routes
-router.use(authenticateAndCheckStatus);
-
 //protected routes
-router.get("/users", getAllUsers);
-router.post("/users/block", blockUsers);
-router.post("/users/unblock", unblockUsers);
-router.post("/users/delete", deleteUsers);
-router.delete("/users/purge-unverified", deleteUnverifiedUsers);
+router.get("/users", authenticateAndCheckStatus, getAllUsers);
+router.post("/users/block", authenticateAndCheckStatus, blockUsers);
+router.post("/users/unblock", authenticateAndCheckStatus, unblockUsers);
+router.post("/users/delete", authenticateAndCheckStatus, deleteUsers);
+router.delete(
+  "/users/purge-unverified",
+  authenticateAndCheckStatus,
+  deleteUnverifiedUsers,
+);
 export default router;
