@@ -105,16 +105,15 @@ export const loginUser = async (req, res) => {
   }
 };
 
-//get all users
+//get all users based on last login
 export const getAllUsers = async (req, res) => {
   try {
     const query = `
-      SELECT id, name, email, status, created_at 
+      SELECT id, name, email, status, last_login_at, created_at 
       FROM users 
-      ORDER BY id ASC;
+      ORDER BY last_login_at DESC;
     `;
     const result = await db.query(query);
-
     return res.status(200).json(result.rows);
   } catch (error) {
     console.error("Fetch Users Error:", error);
