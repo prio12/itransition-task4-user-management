@@ -110,7 +110,7 @@ export const getAllUsers = async (req, res) => {
   console.log("enterin in get all users");
   try {
     const query = `
-      SELECT id, name, email, status, last_login_at, created_at 
+      SELECT id, name, email, status, is_verified, last_login_at, created_at 
       FROM users 
       ORDER BY last_login_at DESC;
     `;
@@ -129,6 +129,7 @@ export const blockUsers = async (req, res) => {
   if (!ids || !Array.isArray(ids) || ids.length === 0) {
     return res.status(400).json({ message: "No target user IDs provided." });
   }
+  console.log("entered", ids);
 
   try {
     const query = `UPDATE users SET status = 'blocked' WHERE id = ANY($1) RETURNING id;`;
@@ -161,7 +162,7 @@ export const unblockUsers = async (req, res) => {
       count: result.rowCount,
     });
   } catch (error) {
-    console.error(" Unblock Error:", error);
+    console.error("Unblock Error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -188,9 +189,8 @@ export const deleteUsers = async (req, res) => {
 };
 
 export const deleteUnverifiedUsers = async (req, res) => {
-  console.log("hello");
   try {
-    const query = `DELETE FROM users WHERE status = 'unverified';`;
+    const query = `DELETE FROM users WHERE is_verified = false;`;
     const result = await db.query(query);
 
     return res.status(200).json({
@@ -206,6 +206,8 @@ export const deleteUnverifiedUsers = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   const { id } = req.query;
 
+  const CLIENT_LOGIN_URL = "http://localhost:5173";
+
   if (!id) {
     return res
       .status(400)
@@ -213,37 +215,32 @@ export const verifyEmail = async (req, res) => {
   }
 
   try {
-    const findUserQuery = `SELECT status FROM users WHERE id = $1;`;
+    const findUserQuery = `SELECT status, is_verified FROM users WHERE id = $1;`;
     const userResult = await db.query(findUserQuery, [id]);
 
     if (userResult.rows.length === 0) {
       return res.status(404).send("<h1>User account not found.</h1>");
     }
 
-    const currentStatus = userResult.rows[0].status;
+    const { status, is_verified } = userResult.rows[0];
 
-    if (currentStatus === "blocked") {
+    if (status === "blocked") {
       return res
-        .status(400)
+        .status(403)
         .send(
-          "<h1>This account is blocked and cannot be activated via email.</h1>",
+          "<h1>This account is blocked and cannot be activated via email validation.</h1>",
         );
     }
 
     const updateQuery = `
       UPDATE users 
-      SET status = 'active' 
-      WHERE id = $1 AND status = 'unverified'
+      SET is_verified = true 
+      WHERE id = $1 
       RETURNING id;
     `;
     await db.query(updateQuery, [id]);
 
-    return res.send(`
-      <div style="font-family: sans-serif; text-align: center; margin-top: 50px; padding: 20px;">
-        <h2 style="color: #2e7d32;">Email Verified Successfully! </h2>
-        <p style="color: #555;">Your account status is now active. You can safely return to the application login.</p>
-      </div>
-    `);
+    return res.redirect(CLIENT_LOGIN_URL);
   } catch (error) {
     console.error("Email Verification Error:", error);
     return res
