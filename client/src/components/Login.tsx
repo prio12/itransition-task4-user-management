@@ -58,7 +58,7 @@ const Login = ({
         <div className="card p-4 border shadow-sm bg-white">
           <div className="text-center mb-3">
             <p className="text-muted small mb-0">Start your journey</p>
-            <h3 className="h5 fw-bold text-dark">Sign In to The App</h3>
+            <h3 className="h5 fw-bold text-dark">Sign In to UserBase</h3>
           </div>
 
           <form onSubmit={handleLoginSubmit}>
