@@ -8,7 +8,7 @@ import type { User } from "./types/user";
 import toast, { Toaster } from "react-hot-toast";
 import Dashboard from "./components/Dashboard";
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://userbase-api.vercel.app/api/auth";
 
 const App = () => {
   const [view, setView] = useState<"login" | "register" | "dashboard">("login");

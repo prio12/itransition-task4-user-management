@@ -206,7 +206,7 @@ export const deleteUnverifiedUsers = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   const { id } = req.query;
 
-  const CLIENT_LOGIN_URL = "http://localhost:5173";
+  const CLIENT_LOGIN_URL = "https://userbase-client.vercel.app/";
 
   if (!id) {
     return res

@@ -11,7 +11,7 @@ export const dispatchEmail = async (userId, userEmail) => {
     },
   });
 
-  const verificationLink = `http://localhost:5000/api/auth/verify-email?id=${userId}`;
+  const verificationLink = `https://userbase-api.vercel.app/api/auth/verify-email?id=${userId}`;
 
   const mailOptions = {
     from: `"User Management Admin" <${process.env.EMAIL_USER}>`,
